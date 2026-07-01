@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <AssemblyName>VibeCast</AssemblyName>
+    <RootNamespace>VibeCast</RootNamespace>
+    <Version>0.1.0</Version>
+    <!-- Single-file friendly publish -->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- Self-contained WinForms apps bundle the entire WPF+WinForms runtime pack
+         (there's no WinForms-only pack, and trimming is blocked for WinForms by
+         the SDK). Compressing the single-file bundle is the safe win: ~55%
+         smaller with no functional risk (only affects packaging, not code). -->
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <!-- Embed the mobile web UI inside the exe (served via ManifestEmbeddedFileProvider) -->
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+  </PropertyGroup>
+
+  <!-- ASP.NET Core (Kestrel, WebSockets, static files) inside a WinForms tray app -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="QRCoder" Version="1.5.1" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.0" />
+  </ItemGroup>
+
+  <!-- Embed the mobile web UI into the assembly (true single-file exe) -->
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\**\*" />
+  </ItemGroup>
+
+</Project>

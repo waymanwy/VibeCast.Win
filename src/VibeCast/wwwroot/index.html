@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f0f14" />
+  <title>VibeCast</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🎙️</span>
+      <span>VibeCast</span>
+    </div>
+    <div class="status">
+      <span id="statusDot" class="dot"></span>
+      <span id="statusText" data-i18n="connecting">connecting…</span>
+    </div>
+  </header>
+
+  <div id="installBanner" class="install-banner" hidden>
+    <span data-i18n="install_hint">Add this page to your home screen for one-tap access.</span>
+    <button id="installDismiss" class="install-dismiss" type="button" aria-label="dismiss">✕</button>
+  </div>
+
+  <main>
+    <div class="card">
+      <p id="focusPreview" class="focus-preview"></p>
+
+      <textarea id="text" data-i18n-ph="placeholder"
+                placeholder="Use your keyboard's mic button to dictate, or type here…"></textarea>
+
+      <div class="toggles">
+        <button id="replaceToggle" class="chip" type="button" data-i18n="toggle_replace" aria-pressed="false">Replace</button>
+        <button id="submitToggle" class="chip" type="button" data-i18n="toggle_submit" aria-pressed="false">↵ Enter</button>
+      </div>
+
+      <div class="actions">
+        <button id="clearBtn" class="ghost" type="button" data-i18n="clear">Clear</button>
+        <button id="sendBtn" class="primary" type="button" data-i18n="send">Send to PC</button>
+      </div>
+
+      <button id="undoBtn" class="ghost undo" type="button" data-i18n="undo" hidden>Undo</button>
+      <p id="toast" class="toast" role="status"></p>
+    </div>
+
+    <details class="help">
+      <summary data-i18n="help_title">Not working?</summary>
+      <ul>
+        <li data-i18n="help_voice">Tap the microphone icon on your own keyboard (Gboard etc.) to dictate — VibeCast just relays the text.</li>
+        <li data-i18n="help_focus">On the PC, click the input box you want the text to land in <em>before</em> pressing Send.</li>
+        <li data-i18n="help_toggles">"Replace" clears the field first instead of inserting; "Enter" submits right after sending.</li>
+        <li data-i18n="help_pair">Opened without a code? Scan the QR code from the PC tray icon again.</li>
+      </ul>
+    </details>
+  </main>
+
+  <footer>
+    <button id="uiLangBtn" class="linklike" type="button">中文 / EN</button>
+  </footer>
+
+  <script src="pairing.js"></script>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

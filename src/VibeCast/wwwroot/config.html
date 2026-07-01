@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f0f14" />
+  <title>VibeCast — Settings</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="logo">⚙️</span><span>Settings</span></div>
+    <a class="linklike" href="index.html">← Back</a>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="settings-row">
+        <div class="settings-label">
+          <span>Notify after each send</span>
+          <span class="settings-hint">Shows a tray balloon when text lands on the PC.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="notify" />
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">
+          <span>Keystroke delay</span>
+          <span class="settings-hint">Increase if a slow app drops characters.</span>
+        </div>
+        <div class="number-input">
+          <input type="number" id="keyDelay" min="0" max="500" step="5" />
+          <span class="unit">ms</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="saveBtn" class="primary" type="button">Save</button>
+    </div>
+    <p id="toast" class="toast" role="status"></p>
+
+    <details class="help">
+      <summary>About the Replace / Enter toggles</summary>
+      <ul>
+        <li>These live on the phone page itself, not here — they're a per-visit choice, not a PC-wide setting.</li>
+        <li><b>Replace</b> off (default) inserts at the cursor; on, it clears the field first.</li>
+        <li><b>Enter</b> presses Enter right after sending — handy for chat boxes, off by default.</li>
+      </ul>
+    </details>
+  </main>
+
+  <script src="pairing.js"></script>
+  <script src="config.js"></script>
+</body>
+</html>
