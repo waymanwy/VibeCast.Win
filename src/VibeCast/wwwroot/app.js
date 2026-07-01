@@ -1,8 +1,8 @@
 // VibeCast mobile client.
 // Voice input comes from the phone's own keyboard (its mic button) — this page
 // only relays whatever text ends up in the textarea to the PC over WebSocket.
-// No target picker: text always goes to whatever's focused on the PC, using the
-// small Replace/Enter toggles below the textarea (remembered per browser).
+// No target picker: text always goes to whatever's focused on the PC, using
+// the Replace option below the send buttons (remembered per browser).
 (function () {
   const $ = (id) => document.getElementById(id);
 
@@ -12,27 +12,26 @@
     text: $("text"),
     clearBtn: $("clearBtn"),
     sendBtn: $("sendBtn"),
+    sendEnterBtn: $("sendEnterBtn"),
     undoBtn: $("undoBtn"),
     toast: $("toast"),
     focusPreview: $("focusPreview"),
     uiLangBtn: $("uiLangBtn"),
     replaceToggle: $("replaceToggle"),
-    submitToggle: $("submitToggle"),
   };
 
   const t = (k) => window.I18N.t(k);
 
-  // ---------------- Replace/Enter toggles (remembered per browser) ----------------
+  // ---------------- Replace toggle (remembered per browser) ----------------
   const TOGGLE_KEY = "vc_toggles";
-  let toggles = { replace: false, submit: false };
+  let toggles = { replace: false };
   try {
     const saved = JSON.parse(localStorage.getItem(TOGGLE_KEY) || "{}");
-    toggles = { replace: !!saved.replace, submit: !!saved.submit };
+    toggles = { replace: !!saved.replace };
   } catch {}
 
   function renderToggles() {
     els.replaceToggle.setAttribute("aria-pressed", String(toggles.replace));
-    els.submitToggle.setAttribute("aria-pressed", String(toggles.submit));
   }
 
   function saveToggles() {
@@ -41,11 +40,6 @@
 
   els.replaceToggle.addEventListener("click", () => {
     toggles.replace = !toggles.replace;
-    renderToggles();
-    saveToggles();
-  });
-  els.submitToggle.addEventListener("click", () => {
-    toggles.submit = !toggles.submit;
     renderToggles();
     saveToggles();
   });
@@ -66,6 +60,7 @@
     els.statusDot.className = "dot " + (state ? "connected" : "disconnected");
     els.statusText.textContent = t(state ? "connected" : "disconnected");
     els.sendBtn.disabled = !state;
+    els.sendEnterBtn.disabled = !state;
   }
 
   function connect() {
@@ -130,18 +125,20 @@
   // ---------------- Send / Undo ----------------
   let pendingSend = false;
   let pendingUndo = false;
+  let lastSubmit = false;
 
-  function doSend() {
+  function doSend(pressEnter) {
     const text = els.text.value;
     if (!text.trim()) { toast(t("nothing"), "err"); return; }
     if (!connected) { toast(t("not_connected"), "err"); return; }
 
+    lastSubmit = pressEnter;
     pendingSend = true;
     const ok = send({
       type: "inject",
       text,
       mode: toggles.replace ? "dialog" : "editor",
-      submit: toggles.submit,
+      submit: pressEnter,
     });
     if (!ok) { pendingSend = false; toast(t("send_failed"), "err"); }
   }
@@ -152,7 +149,7 @@
     if (msg.ok) {
       toast(t("sent") + (msg.target ? " → " + msg.target : ""), "ok");
       els.text.value = "";
-      els.undoBtn.hidden = toggles.submit; // submitted text likely already committed
+      els.undoBtn.hidden = lastSubmit; // submitted text likely already committed
     } else {
       toast((msg.message ? msg.message : t("send_failed")), "err");
     }
@@ -196,8 +193,42 @@
     localStorage.setItem(INSTALL_DISMISSED_KEY, "1");
   });
 
+  // ---------------- Keyboard-aware layout ----------------
+  let maxViewportHeight = Math.max(window.innerHeight || 0, window.visualViewport ? window.visualViewport.height : 0);
+
+  function updateVisibleHeight() {
+    const vv = window.visualViewport;
+    const visibleHeight = vv ? vv.height : window.innerHeight;
+    const layoutHeight = window.innerHeight || document.documentElement.clientHeight || visibleHeight;
+    maxViewportHeight = Math.max(maxViewportHeight, layoutHeight, visibleHeight);
+    const keyboardOpen = maxViewportHeight - Math.min(layoutHeight, visibleHeight) > 90;
+
+    document.documentElement.style.setProperty("--visible-height", `${Math.max(320, Math.round(visibleHeight))}px`);
+    document.body.classList.toggle("keyboard-open", keyboardOpen);
+  }
+
+  updateVisibleHeight();
+  window.addEventListener("resize", updateVisibleHeight);
+  window.addEventListener("orientationchange", updateVisibleHeight);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", updateVisibleHeight);
+    window.visualViewport.addEventListener("scroll", updateVisibleHeight);
+  }
+
+  // ---------------- Auto-focus on first tap ----------------
+  // Mobile browsers only pop the on-screen keyboard from focus() when it runs
+  // synchronously inside a user gesture, so piggyback on the page's very first
+  // tap (anywhere except a button) to focus the textarea immediately, saving
+  // the user from having to aim at the small textarea themselves.
+  function firstTapFocus(ev) {
+    document.removeEventListener("click", firstTapFocus, true);
+    if (!ev.target.closest("button")) els.text.focus();
+  }
+  document.addEventListener("click", firstTapFocus, true);
+
   // ---------------- Wire up ----------------
-  els.sendBtn.addEventListener("click", doSend);
+  els.sendBtn.addEventListener("click", () => doSend(false));
+  els.sendEnterBtn.addEventListener("click", () => doSend(true));
   els.undoBtn.addEventListener("click", doUndo);
   els.clearBtn.addEventListener("click", () => { els.text.value = ""; });
   els.uiLangBtn.addEventListener("click", () => {

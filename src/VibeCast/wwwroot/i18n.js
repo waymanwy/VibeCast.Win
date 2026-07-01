@@ -7,9 +7,9 @@
       disconnected: "disconnected",
       placeholder: "Use your keyboard's mic button to dictate, or type here…",
       toggle_replace: "Replace",
-      toggle_submit: "↵ Enter",
       clear: "Clear",
       send: "Send to PC",
+      send_enter: "Send + Enter",
       sent: "Sent ✓",
       undo: "Undo",
       undone: "Undone ✓",
@@ -25,7 +25,8 @@
       help_title: "Not working?",
       help_voice: "Tap the microphone icon on your own keyboard (Gboard etc.) to dictate — VibeCast just relays the text.",
       help_focus: "On the PC, click the target input box before pressing Send.",
-      help_toggles: "\"Replace\" clears the field first instead of inserting; \"Enter\" submits right after sending.",
+      help_toggles: "\"Replace\" clears the field first instead of inserting, for overwriting a search box or address bar instead of inserting at the cursor.",
+      help_send: "\"Send to PC\" just types the text; \"Send + Enter\" also presses Enter right after.",
       help_pair: "Opened without a code? Scan the QR code from the PC tray icon again."
     },
     zh: {
@@ -34,9 +35,9 @@
       disconnected: "已断开",
       placeholder: "用手机输入法的麦克风按钮口述，或直接在此输入…",
       toggle_replace: "替换",
-      toggle_submit: "↵ 回车",
       clear: "清空",
       send: "发送到电脑",
+      send_enter: "发送并回车",
       sent: "已发送 ✓",
       undo: "撤销",
       undone: "已撤销 ✓",
@@ -52,7 +53,8 @@
       help_title: "无法使用？",
       help_voice: "点击手机输入法自带的麦克风图标（如 Gboard）口述，VibeCast 只负责把文字传过去。",
       help_focus: "在电脑上，先点好要接收文字的输入框，再按发送。",
-      help_toggles: "「替换」会先清空输入框再写入，不勾选就是在光标处插入；「回车」是发送后自动按一次回车。",
+      help_toggles: "「替换」会先清空输入框再写入，不勾选就是在光标处插入；适合往搜索框、地址栏这类需要整体替换而非插入的地方发送。",
+      help_send: "「发送到电脑」只是把文字打进去；「发送并回车」会在打字后再自动按一次回车。",
       help_pair: "打开的链接没带配对码？请重新扫描电脑托盘图标弹出的二维码。"
     }
   };

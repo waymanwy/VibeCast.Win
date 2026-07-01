@@ -13,6 +13,7 @@
   --radius-md: 14px;
   --radius-sm: 10px;
   --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --visible-height: 100dvh;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -27,10 +28,19 @@ html, body {
 }
 
 body {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
-  padding-bottom: env(safe-area-inset-bottom);
+  overflow-x: hidden;
 }
 
 .topbar {
@@ -84,18 +94,38 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-main {
-  flex: 1;
-  padding: 18px 16px;
+/* #screen is sized by JS to the visible area above the keyboard
+   (window.visualViewport.height), so the card fills it and the send buttons
+   land right on the keyboard's top edge. Everything in .belowfold sits under
+   that line — covered by the keyboard while typing. */
+#screen {
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  width: 100%;
+  padding-bottom: calc(6px + env(safe-area-inset-bottom));
+}
+
+.keyboard-open #screen {
+  flex: 0 0 var(--visible-height);
+  height: var(--visible-height);
+}
+
+.belowfold {
   max-width: 640px;
   width: 100%;
   margin: 0 auto;
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .card {
+  flex: 1;
+  min-height: 0;
+  margin: 16px 16px 10px;
   background: var(--panel);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-lg);
@@ -126,15 +156,15 @@ main {
 
 textarea {
   width: 100%;
-  min-height: 220px;
+  min-height: 72px;
   flex: 1;
-  resize: vertical;
+  resize: none;
   background: var(--panel-2);
   color: var(--text);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-md);
-  padding: 16px;
-  font-size: 18px;
+  padding: 14px;
+  font-size: 15px;
   line-height: 1.55;
   font-family: inherit;
   transition: border-color .15s var(--ease), background .15s var(--ease);
@@ -146,8 +176,16 @@ textarea:focus {
   background: var(--panel-3);
 }
 
-.toggles { display: flex; gap: 8px; }
+.util-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 16px 0;
+  padding-bottom: calc(6px + env(safe-area-inset-bottom));
+  flex: 0 0 auto;
+}
 .chip {
+  flex: 1;
   cursor: pointer;
   font-family: inherit;
   border: 1px solid rgba(255, 255, 255, 0.10);
@@ -157,6 +195,7 @@ textarea:focus {
   padding: 9px 16px;
   font-size: 13px;
   font-weight: 600;
+  min-width: 0;
   transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease), transform .08s;
 }
 .chip:active { transform: scale(0.96); }
@@ -166,7 +205,7 @@ textarea:focus {
   color: var(--accent-2);
 }
 
-.actions { display: flex; gap: 10px; }
+.actions { display: flex; gap: 10px; margin: 0 16px; }
 button {
   cursor: pointer;
   font-family: inherit;
@@ -177,16 +216,39 @@ button {
   font-weight: 600;
   transition: background .15s var(--ease), opacity .15s var(--ease), transform .08s;
 }
-.primary {
-  flex: 2;
+
+/* Send buttons: equal-width pair, distinguished by fill. Kept compact —
+   they sit just above the phone keyboard, in the thumb zone. */
+.btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 11px 10px;
+  font-size: 15px;
+}
+.btn-ico { font-size: 15px; line-height: 1; flex-shrink: 0; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: .45; box-shadow: none; }
+
+/* Primary: types text + presses Enter (the one-tap "done" action). */
+.send-go {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #fff;
   box-shadow: 0 4px 16px rgba(94, 92, 230, 0.35);
 }
-.primary:active { transform: scale(0.98); filter: brightness(0.95); }
-.primary:disabled { opacity: .45; box-shadow: none; }
-.ghost { flex: 1; background: var(--panel-2); color: var(--text); border: 1px solid rgba(255, 255, 255, 0.08); }
-.ghost:active { background: var(--panel-3); transform: scale(0.98); }
+.send-go:active { filter: brightness(0.95); }
+.send-go:disabled { box-shadow: none; }
+
+/* Secondary: just types the text, leaves the cursor for you. */
+.send-soft {
+  background: rgba(94, 92, 230, 0.16);
+  color: var(--accent-2);
+  border: 1px solid rgba(94, 92, 230, 0.30);
+}
+.send-soft:active { background: rgba(94, 92, 230, 0.24); }
 
 .toast {
   min-height: 18px;
@@ -203,7 +265,7 @@ button {
 .toast.ok { color: var(--ok); }
 .toast.err { color: var(--danger); }
 
-.undo { width: 100%; }
+.undo { margin: 10px 16px 0; }
 .undo[hidden] { display: none; }
 
 .help {

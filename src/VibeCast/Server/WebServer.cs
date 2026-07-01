@@ -67,7 +67,20 @@ public sealed class WebServer
 
         app.UseWebSockets();
         app.UseDefaultFiles(new DefaultFilesOptions { FileProvider = webFiles }); // "/" -> index.html
-        app.UseStaticFiles(new StaticFileOptions { FileProvider = webFiles });
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = webFiles,
+            // Phones (and stubborn in-app browsers) otherwise cache the UI and
+            // never pick up updates. The payload is tiny and embedded, so just
+            // tell clients never to cache it — always revalidate against us.
+            OnPrepareResponse = ctx =>
+            {
+                var headers = ctx.Context.Response.Headers;
+                headers.CacheControl = "no-store, no-cache, must-revalidate";
+                headers.Pragma = "no-cache";
+                headers.Expires = "0";
+            }
+        });
 
         MapApi(app);
         MapWebSocket(app);
